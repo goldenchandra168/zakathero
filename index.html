@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Zakat Hero 🌙 — Game Edukasi Zakat by Golden Flow Travel</title>
+<meta name="description" content="Belajar zakat sambil bermain! Tangkap koin halal, hindari koin haram, bantu 8 asnaf zakat.">
+<meta property="og:title" content="Zakat Hero - Game Edukasi Zakat Islam">
+<meta property="og:description" content="Game edukasi Islam untuk anak-anak tentang zakat dan asnaf. by Golden Flow Travel">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Nunito',sans-serif;background:#060f1a;color:#fff;overflow:hidden;height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center}
+#gameWrapper{position:relative;width:min(400px,100vw);height:min(700px,100dvh);overflow:hidden;border-radius:20px;box-shadow:0 0 80px rgba(255,200,50,0.12)}
+
+/* ── SCREENS ── */
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow-y:auto;padding:28px 22px 24px;text-align:center;background:linear-gradient(160deg,#112211 0%,#0d1b2a 55%,#12122a 100%)}
+.screen.hidden{display:none}
+.screen-center{justify-content:center}
+
+/* ── TYPOGRAPHY ── */
+.logo-title{font-size:40px;font-weight:900;color:#ffd700;letter-spacing:-1px;margin-bottom:2px}
+.logo-sub{font-size:12px;color:#a8d8a8;letter-spacing:2.5px;font-weight:700;margin-bottom:28px;text-transform:uppercase}
+.section-title{font-size:22px;font-weight:900;color:#ffd700;margin-bottom:6px}
+.section-sub{font-size:13px;color:#aaa;margin-bottom:20px}
+
+/* ── BUTTONS ── */
+.btn{display:inline-block;padding:13px 32px;border-radius:50px;font-family:'Nunito',sans-serif;font-size:16px;font-weight:800;cursor:pointer;border:none;transition:transform .15s,box-shadow .15s;margin:5px;min-width:170px}
+.btn:active{transform:scale(0.96)}
+.btn-gold{background:linear-gradient(135deg,#ffd700,#ff9500);color:#1a1000;box-shadow:0 4px 20px rgba(255,180,0,0.35)}
+.btn-gold:hover{box-shadow:0 6px 28px rgba(255,180,0,0.55)}
+.btn-ghost{background:rgba(255,255,255,0.07);color:#ddd;border:1.5px solid rgba(255,255,255,0.2)}
+.btn-ghost:hover{background:rgba(255,255,255,0.14)}
+.btn-green{background:linear-gradient(135deg,#43a047,#1b5e20);color:#fff;box-shadow:0 4px 16px rgba(67,160,71,0.35)}
+.btn-sm{padding:9px 22px;font-size:13px;min-width:0}
+
+/* ── FORMS ── */
+.form-group{width:100%;margin-bottom:14px;text-align:left}
+.form-label{font-size:12px;font-weight:800;color:#a8d8a8;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;display:block}
+.form-input{width:100%;padding:13px 16px;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.12);border-radius:14px;color:#fff;font-family:'Nunito',sans-serif;font-size:15px;font-weight:600;outline:none;transition:border-color .2s,background .2s}
+.form-input::placeholder{color:rgba(255,255,255,0.3);font-weight:400}
+.form-input:focus{border-color:#ffd700;background:rgba(255,215,0,0.06)}
+.form-err{font-size:12px;color:#ff6b6b;margin-top:5px;display:none}
+.form-note{font-size:11px;color:#666;margin-top:4px}
+
+/* ── AUTH CARD ── */
+.auth-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:22px;padding:24px 20px;width:100%;margin-bottom:16px}
+.auth-tab-row{display:flex;gap:8px;margin-bottom:22px;background:rgba(0,0,0,0.3);border-radius:40px;padding:4px}
+.auth-tab{flex:1;padding:9px;border-radius:36px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;border:none;background:transparent;color:rgba(255,255,255,0.4);transition:all .2s}
+.auth-tab.active{background:linear-gradient(135deg,#ffd700,#ff9500);color:#1a1000}
+
+/* ── USER PILL (menu) ── */
+.user-pill{background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.25);border-radius:40px;padding:8px 16px;font-size:13px;font-weight:700;color:#ffd700;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.user-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#ffd700,#ff9500);display:flex;align-items:center;justify-content:center;font-size:15px;color:#1a1000;font-weight:900;flex-shrink:0}
+
+/* ── HUD ── */
+.hud{position:absolute;top:0;left:0;right:0;padding:10px 14px 8px;background:rgba(0,0,0,0.55);backdrop-filter:blur(10px);display:flex;justify-content:space-between;align-items:center;z-index:10;gap:6px}
+.hud-block{font-size:11px;font-weight:700;text-align:center}
+.hud-block span{font-size:20px;display:block;line-height:1.1;font-weight:900}
+.hud-block.gold span{color:#ffd700}
+.hud-block.green span{color:#4CAF50}
+.hud-block.blue span{color:#87CEEB}
+.hud-lives{font-size:18px;letter-spacing:1px}
+
+/* ── CANVAS ── */
+canvas{display:block;width:100%;height:100%}
+
+/* ── CONTACT BAR ── */
+.contact-bar{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(10px);padding:8px 14px;display:flex;justify-content:space-around;align-items:center;font-size:10px;z-index:10;border-top:1px solid rgba(255,215,0,0.15)}
+.contact-item{display:flex;align-items:center;gap:5px;color:#bbb;text-decoration:none;font-weight:700;transition:color .2s}
+.contact-item:hover{color:#ffd700}
+.contact-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+
+/* ── OVERLAYS / POPUPS ── */
+.popup-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.87);display:flex;align-items:center;justify-content:center;z-index:50;backdrop-filter:blur(5px)}
+.popup-overlay.popup-hidden{display:none}
+.popup-card{background:linear-gradient(160deg,#1c381c,#182838);border:1.5px solid rgba(255,215,0,0.25);border-radius:24px;padding:26px 22px;max-width:330px;width:92%;text-align:center;max-height:90vh;overflow-y:auto}
+.popup-icon{font-size:58px;margin-bottom:10px;display:block}
+.popup-title{font-size:21px;font-weight:900;color:#ffd700;margin-bottom:6px}
+.popup-sub{font-size:13px;color:#a8d8a8;font-weight:700;margin-bottom:6px}
+.popup-text{font-size:13px;color:#bbb;line-height:1.65;margin-bottom:18px}
+
+/* ── STATS GRID ── */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0;width:100%}
+.stat-box{background:rgba(255,255,255,0.05);border-radius:14px;padding:12px 8px;text-align:center}
+.stat-box .val{font-size:24px;font-weight:900;color:#ffd700}
+.stat-box .lbl{font-size:10px;color:#888;margin-top:3px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+
+/* ── TUTORIAL CARD ── */
+.t-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:14px 16px;margin:7px 0;text-align:left;display:flex;gap:12px;align-items:flex-start}
+.t-icon{font-size:26px;flex-shrink:0;margin-top:2px}
+.t-text{font-size:13px;color:#bbb;line-height:1.45}
+.t-text strong{color:#ffd700;display:block;margin-bottom:2px;font-size:14px}
+
+/* ── INFAQ CARD ── */
+.infaq-card{background:rgba(0,131,58,0.15);border:1px solid rgba(0,131,58,0.3);border-radius:16px;padding:16px;margin:14px 0;font-size:12px;color:#a8d8a8;line-height:1.7;text-align:left}
+.infaq-card strong{color:#4CAF50;display:block;margin-bottom:4px;font-size:13px}
+
+/* ── MISC ── */
+.divider{width:100%;height:1px;background:rgba(255,255,255,0.07);margin:14px 0}
+.status-msg{font-size:12px;min-height:18px;margin-top:6px;font-weight:700}
+.status-msg.ok{color:#4CAF50}
+.status-msg.err{color:#ff6b6b}
+.status-msg.loading{color:#ffd700}
+
+/* ── FX overlays ── */
+.naudzubillah{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:30}
+.naudzubillah span{font-size:26px;font-weight:900;color:#ff6b6b;text-shadow:0 0 20px rgba(255,80,80,0.9);opacity:0;transition:opacity .12s;text-align:center}
+.zakat-flash{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:30}
+.zakat-flash div{font-size:20px;font-weight:900;color:#4CAF50;text-shadow:0 0 20px rgba(76,175,80,0.9);opacity:0;text-align:center;line-height:1.4}
+
+/* ── ANIMATIONS ── */
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.float-anim{animation:float 3s ease-in-out infinite}
+.pulse-anim{animation:pulse 2s ease-in-out infinite}
+.spin{animation:spin .8s linear infinite;display:inline-block}
+
+/* ── LEADERBOARD ── */
+.lb-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,0.04);border-radius:12px;margin:5px 0;font-size:13px;text-align:left}
+.lb-rank{width:24px;font-weight:900;color:#ffd700;text-align:center}
+.lb-name{flex:1;font-weight:700}
+.lb-score{font-weight:900;color:#ffd700}
+.lb-me{border:1px solid rgba(255,215,0,0.4);background:rgba(255,215,0,0.06)}
+</style>
+</head>
+<body>
+<div id="gameWrapper">
+
+<!-- ═══════════════════════════════════════
+     AUTH SCREEN  (login / register)
+═══════════════════════════════════════ -->
+<div class="screen screen-center" id="authScreen">
+  <div style="font-size:28px;margin-bottom:4px" class="float-anim">🌙</div>
+  <div class="logo-title">ZAKAT HERO</div>
+  <div class="logo-sub">Game Edukasi Zakat Islam</div>
+
+  <div class="auth-card" style="width:100%">
+    <div class="auth-tab-row">
+      <button class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Masuk</button>
+      <button class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Daftar Baru</button>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div id="loginForm">
+      <div class="form-group">
+        <label class="form-label">Nomor WhatsApp</label>
+        <input class="form-input" id="loginWa" type="tel" placeholder="628xxxxxxxxxx" inputmode="numeric">
+        <div class="form-note">Masukkan nomor WA yang didaftarkan</div>
+      </div>
+      <div id="loginErr" class="form-err">❌ Nomor WA tidak ditemukan. Silakan daftar dulu.</div>
+      <button class="btn btn-gold" style="width:100%;margin:0" onclick="doLogin()">Masuk ▶</button>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div id="registerForm" style="display:none">
+      <div class="form-group">
+        <label class="form-label">Nama Lengkap</label>
+        <input class="form-input" id="regName" type="text" placeholder="Masukkan nama kamu">
+        <div id="regNameErr" class="form-err">Nama wajib diisi</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nomor WhatsApp</label>
+        <input class="form-input" id="regWa" type="tel" placeholder="628xxxxxxxxxx" inputmode="numeric">
+        <div id="regWaErr" class="form-err">Nomor WA wajib diisi (min 10 digit)</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email (opsional)</label>
+        <input class="form-input" id="regEmail" type="email" placeholder="email@contoh.com">
+        <div id="regEmailErr" class="form-err">Format email tidak valid</div>
+      </div>
+      <div id="regErr" class="form-err" style="margin-bottom:10px">Terjadi kesalahan, coba lagi</div>
+      <button class="btn btn-gold" style="width:100%;margin:0" onclick="doRegister()">Daftar & Mulai 🎮</button>
+    </div>
+
+    <div class="status-msg" id="authStatus"></div>
+  </div>
+
+  <div style="font-size:11px;color:#444;margin-top:8px">Data kamu aman 🔒 — hanya digunakan untuk menyimpan skor</div>
+  <button class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="skipAuth()">Lanjut tanpa daftar →</button>
+  <p style="font-size:10px;color:#333;margin-top:14px">by 🌿 Golden Flow Travel</p>
+</div>
+
+<!-- ═══════════════════════════════════════
+     MENU SCREEN
+═══════════════════════════════════════ -->
+<div class="screen screen-center hidden" id="menuScreen">
+  <div style="font-size:26px;margin-bottom:2px" class="float-anim">🌙</div>
+  <div class="logo-title">ZAKAT HERO</div>
+  <div class="logo-sub">Game Edukasi Zakat Islam</div>
+
+  <!-- User pill -->
+  <div class="user-pill" id="userPill" style="display:none">
+    <div class="user-avatar" id="userAvatar">?</div>
+    <span id="userGreeting">Halo!</span>
+    <button onclick="doLogout()" style="background:rgba(255,0,0,0.15);border:none;border-radius:20px;padding:3px 10px;color:#ff9999;font-size:11px;font-weight:800;cursor:pointer;margin-left:auto">Keluar</button>
+  </div>
+
+  <div style="font-size:68px;margin-bottom:18px" class="pulse-anim">🪙</div>
+  <p style="font-size:13px;color:#a8d8a8;margin-bottom:22px;line-height:1.7">Tangkap koin halal, hindari koin haram,<br>dan bantu 8 asnaf zakat! 🤲</p>
+
+  <button class="btn btn-gold" onclick="beginGame()">▶ Mulai Bermain</button>
+  <button class="btn btn-ghost" onclick="showScreen('tutorialScreen')">📖 Cara Bermain</button>
+  <button class="btn btn-ghost" onclick="openLeaderboard()">🏆 Papan Skor</button>
+  <button class="btn btn-ghost" onclick="showScreen('contactScreen')">🌿 Kontak & Infaq</button>
+
+  <p style="font-size:10px;color:#333;margin-top:18px">by Golden Flow Travel — Umroh & Haji Terpercaya</p>
+</div>
+
+<!-- ═══════════════════════════════════════
+     TUTORIAL SCREEN
+═══════════════════════════════════════ -->
+<div class="screen hidden" id="tutorialScreen">
+  <div class="section-title" style="margin-top:4px">📖 Cara Bermain</div>
+  <div class="section-sub">Mudah dan menyenangkan!</div>
+  <div class="t-card"><div class="t-icon">👆</div><div class="t-text"><strong>Gerakkan Karakter</strong>Sentuh / geser layar untuk menggerakkan karakter kiri-kanan</div></div>
+  <div class="t-card"><div class="t-icon">💰</div><div class="t-text"><strong>Tangkap Koin Halal</strong>Koin emas (+10) dan koin perak (+5) adalah rezeki halal — tangkap sebanyak mungkin!</div></div>
+  <div class="t-card"><div class="t-icon">🎲</div><div class="t-text"><strong>Hindari Koin Haram</strong>Koin judi 🎲, koin riba 📊, dan koin dusta 🤥 akan mengurangi nyawa kamu</div></div>
+  <div class="t-card"><div class="t-icon">🤲</div><div class="t-text"><strong>Zakat Otomatis 2.5%</strong>Setiap 50 koin halal terkumpul, 2.5% otomatis dizakatkan kepada mustahiq</div></div>
+  <div class="t-card"><div class="t-icon">📚</div><div class="t-text"><strong>Pelajari 8 Asnaf</strong>Setiap naik level, kamu akan belajar tentang 8 golongan penerima zakat dalam Islam</div></div>
+  <div class="t-card"><div class="t-icon">❤️</div><div class="t-text"><strong>3 Nyawa</strong>Kena koin haram 3 kali = game over. Hati-hati!</div></div>
+  <button class="btn btn-gold" style="margin-top:20px" onclick="showScreen('menuScreen')">Mengerti! 👍</button>
+</div>
+
+<!-- ═══════════════════════════════════════
+     CONTACT SCREEN
+═══════════════════════════════════════ -->
+<div class="screen hidden" id="contactScreen">
+  <div class="section-title" style="margin-top:4px">🌿 Golden Flow Travel</div>
+  <div class="section-sub">Umroh & Haji Terpercaya Indonesia</div>
+  <a href="https://wa.me/62895322412300" class="t-card" style="text-decoration:none;color:inherit;cursor:pointer;display:flex;width:100%">
+    <div class="t-icon">📱</div>
+    <div class="t-text"><strong style="color:#25D366">WhatsApp</strong>+62 895-3224-12300<br><small style="color:#666">Klik untuk chat langsung ↗</small></div>
+  </a>
+  <a href="https://instagram.com/goldenflow.id" class="t-card" style="text-decoration:none;color:inherit;cursor:pointer;display:flex;width:100%;margin-top:0">
+    <div class="t-icon">📸</div>
+    <div class="t-text"><strong style="color:#e6683c">Instagram</strong>@goldenflow.id<br><small style="color:#666">Follow untuk info Umroh & Haji ↗</small></div>
+  </a>
+  <div class="infaq-card" style="width:100%">
+    <strong>💚 Infaq & Donasi Pengembangan</strong>
+    Dukung pengembangan konten edukasi Islam ini:<br><br>
+    🏦 <strong style="color:#fff">Bank Syariah Indonesia (BSI)</strong><br>
+    a.n. <strong style="color:#fff">Golden Chandra Oentoro</strong><br>
+    No. Rek: <strong style="color:#4CAF50;font-size:17px;letter-spacing:1px">7167474505</strong><br><br>
+    <em style="font-size:11px;color:#666">Jazakallahu khairan atas dukungannya 🤲</em>
+  </div>
+  <button class="btn btn-gold" style="margin-top:16px" onclick="showScreen('menuScreen')">← Kembali</button>
+</div>
+
+<!-- ═══════════════════════════════════════
+     GAME SCREEN
+═══════════════════════════════════════ -->
+<div class="screen hidden" id="gameScreen" style="padding:0;background:#060f1a">
+  <div class="hud">
+    <div class="hud-block gold">Skor<span id="hudScore">0</span></div>
+    <div class="hud-block green">Zakat<span id="hudZakat">0.00</span></div>
+    <div class="hud-block blue">Level<span id="hudLevel">1</span></div>
+    <div class="hud-lives" id="hudLives">❤️❤️❤️</div>
+  </div>
+  <canvas id="gameCanvas"></canvas>
+  <div class="naudzubillah" id="naudzubillah"><span id="naudzText">😱 Naudzubillah!</span></div>
+  <div class="zakat-flash" id="zakatFlash"><div id="zakatFlashText">🤲 Zakat Terbayar!<br>Jazakallahu Khairan!</div></div>
+  <div class="contact-bar">
+    <a href="https://wa.me/62895322412300" class="contact-item"><div class="contact-dot" style="background:#25D366"></div>WA: +62895322412300</a>
+    <a href="https://instagram.com/goldenflow.id" class="contact-item"><div class="contact-dot" style="background:#e6683c"></div>@goldenflow.id</a>
+  </div>
+  <button onclick="pauseGame()" style="position:absolute;top:56px;right:10px;background:rgba(255,255,255,0.08);border:none;border-radius:8px;padding:5px 9px;color:#fff;font-size:15px;cursor:pointer;z-index:20">⏸</button>
+</div>
+
+<!-- ═══════════════════════════════════════
+     LEADERBOARD POPUP
+═══════════════════════════════════════ -->
+<div class="popup-overlay popup-hidden" id="lbPopup">
+  <div class="popup-card" style="width:94%">
+    <span class="popup-icon">🏆</span>
+    <div class="popup-title">Papan Skor</div>
+    <div id="lbContent" style="width:100%;min-height:80px;display:flex;align-items:center;justify-content:center">
+      <span class="status-msg loading"><span class="spin">⏳</span> Memuat...</span>
+    </div>
+    <button class="btn btn-gold" style="margin-top:16px" onclick="closePopup('lbPopup')">Tutup</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     ASNAF POPUP
+═══════════════════════════════════════ -->
+<div class="popup-overlay popup-hidden" id="asnafPopup">
+  <div class="popup-card">
+    <span class="popup-icon" id="asnafIcon">🤲</span>
+    <div class="popup-title" id="asnafTitle">Asnaf Zakat</div>
+    <div class="popup-sub" id="asnafSub">Golongan Penerima Zakat</div>
+    <div class="popup-text" id="asnafText">...</div>
+    <div style="background:rgba(255,215,0,0.08);border-radius:12px;padding:10px;margin-bottom:18px;font-size:12px;color:#ffd700;line-height:1.5">
+      📖 <em id="asnafAyat">...</em>
+    </div>
+    <button class="btn btn-gold" onclick="resumeFromAsnaf()">Lanjutkan ▶</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PAUSE POPUP
+═══════════════════════════════════════ -->
+<div class="popup-overlay popup-hidden" id="pausePopup">
+  <div class="popup-card">
+    <span class="popup-icon">⏸</span>
+    <div class="popup-title">Game Dijeda</div>
+    <div class="popup-text">Istirahat sejenak, ya! 😊</div>
+    <button class="btn btn-gold" onclick="resumeGame()">▶ Lanjutkan</button>
+    <button class="btn btn-ghost" onclick="goToMenu()">🏠 Menu Utama</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     GAME OVER POPUP
+═══════════════════════════════════════ -->
+<div class="popup-overlay popup-hidden" id="gameOverPopup">
+  <div class="popup-card" style="width:94%">
+    <span class="popup-icon">🌙</span>
+    <div class="popup-title">Permainan Selesai!</div>
+    <div class="stats-grid">
+      <div class="stat-box"><div class="val" id="goScore">0</div><div class="lbl">Skor</div></div>
+      <div class="stat-box"><div class="val" id="goLevel">1</div><div class="lbl">Level</div></div>
+      <div class="stat-box"><div class="val" id="goZakat">0</div><div class="lbl">Zakat</div></div>
+      <div class="stat-box"><div class="val" id="goHiScore">0</div><div class="lbl">Rekor</div></div>
+    </div>
+    <div class="status-msg" id="goStatus" style="margin-bottom:12px"></div>
+    <button class="btn btn-gold" onclick="restartGame()">🔄 Main Lagi</button>
+    <button class="btn btn-ghost" onclick="goToMenu()">🏠 Menu</button>
+    <button class="btn btn-green btn-sm" onclick="showScreen('contactScreen')" style="margin-top:6px">🌿 Kontak Golden Flow</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+// ══════════════════════════════════════
+//  CONFIG — ganti SCRIPT_URL setelah deploy Apps Script
+// ══════════════════════════════════════
+const SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_APPS_SCRIPT_WEB_APP_ID/exec';
+
+// ══════════════════════════════════════
+//  USER SESSION
+// ══════════════════════════════════════
+let currentUser = null; // {name, wa, email, registered}
+
+function loadSession() {
+  try {
+    const s = localStorage.getItem('zakatHeroUser');
+    if (s) currentUser = JSON.parse(s);
+  } catch(e) { currentUser = null; }
+}
+
+function saveSession(user) {
+  currentUser = user;
+  localStorage.setItem('zakatHeroUser', JSON.stringify(user));
+}
+
+function clearSession() {
+  currentUser = null;
+  localStorage.removeItem('zakatHeroUser');
+}
+
+// ══════════════════════════════════════
+//  SHEETS API HELPERS
+// ══════════════════════════════════════
+async function sheetsPost(payload) {
+  // no-cors → opaque response, kita tidak bisa baca hasilnya di sini.
+  // Gunakan GET + params untuk read, POST no-cors untuk write.
+  await fetch(SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+}
+
+async function sheetsGet(params) {
+  const qs = new URLSearchParams(params).toString();
+  const res = await fetch(`${SCRIPT_URL}?${qs}`);
+  return res.json();
+}
+
+// ══════════════════════════════════════
+//  AUTH TAB SWITCHER
+// ══════════════════════════════════════
+function switchAuthTab(tab) {
+  const isLogin = tab === 'login';
+  document.getElementById('tabLogin').classList.toggle('active', isLogin);
+  document.getElementById('tabRegister').classList.toggle('active', !isLogin);
+  document.getElementById('loginForm').style.display = isLogin ? '' : 'none';
+  document.getElementById('registerForm').style.display = isLogin ? 'none' : '';
+  document.getElementById('authStatus').textContent = '';
+  document.getElementById('loginErr').style.display = 'none';
+  document.getElementById('regErr').style.display = 'none';
+}
+
+// ══════════════════════════════════════
+//  LOGIN
+// ══════════════════════════════════════
+async function doLogin() {
+  const wa = document.getElementById('loginWa').value.trim().replace(/\D/g,'');
+  const err = document.getElementById('loginErr');
+  const status = document.getElementById('authStatus');
+  err.style.display = 'none';
+
+  if (wa.length < 10) {
+    err.textContent = '❌ Masukkan nomor WhatsApp yang valid';
+    err.style.display = 'block';
+    return;
+  }
+
+  status.className = 'status-msg loading';
+  status.innerHTML = '<span class="spin">⏳</span> Memeriksa data...';
+
+  try {
+    const res = await sheetsGet({ action: 'login', wa });
+    if (res.success) {
+      saveSession({ name: res.name, wa: res.wa, email: res.email || '', registered: true, highScore: res.highScore || 0 });
+      status.textContent = '';
+      afterAuth();
+    } else {
+      err.textContent = '❌ Nomor WA tidak ditemukan. Silakan daftar terlebih dahulu.';
+      err.style.display = 'block';
+      status.textContent = '';
+    }
+  } catch(e) {
+    status.className = 'status-msg err';
+    status.textContent = '⚠️ Gagal terhubung ke server. Coba lagi.';
+  }
+}
+
+// ══════════════════════════════════════
+//  REGISTER
+// ══════════════════════════════════════
+async function doRegister() {
+  const name  = document.getElementById('regName').value.trim();
+  const wa    = document.getElementById('regWa').value.trim().replace(/\D/g,'');
+  const email = document.getElementById('regEmail').value.trim();
+
+  // Reset errors
+  ['regNameErr','regWaErr','regEmailErr','regErr'].forEach(id => document.getElementById(id).style.display = 'none');
+  const status = document.getElementById('authStatus');
+
+  let valid = true;
+  if (!name) { document.getElementById('regNameErr').style.display = 'block'; valid = false; }
+  if (wa.length < 10) { document.getElementById('regWaErr').style.display = 'block'; valid = false; }
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    document.getElementById('regEmailErr').style.display = 'block'; valid = false;
+  }
+  if (!valid) return;
+
+  status.className = 'status-msg loading';
+  status.innerHTML = '<span class="spin">⏳</span> Mendaftarkan akun...';
+
+  try {
+    await sheetsPost({
+      action: 'register',
+      name, wa, email,
+      registeredAt: new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })
+    });
+    // Karena no-cors kita tidak bisa tahu hasilnya → langsung login saja
+    saveSession({ name, wa, email, registered: true, highScore: 0 });
+    status.className = 'status-msg ok';
+    status.textContent = '✅ Berhasil! Selamat datang, ' + name + '!';
+    setTimeout(() => { status.textContent = ''; afterAuth(); }, 1200);
+  } catch(e) {
+    status.className = 'status-msg err';
+    status.textContent = '⚠️ Gagal menyimpan data. Cek koneksi internet.';
+  }
+}
+
+function skipAuth() {
+  saveSession({ name: 'Tamu', wa: '', email: '', registered: false, highScore: 0 });
+  afterAuth();
+}
+
+function afterAuth() {
+  updateUserPill();
+  showScreen('menuScreen');
+}
+
+function doLogout() {
+  clearSession();
+  showScreen('authScreen');
+  document.getElementById('userPill').style.display = 'none';
+}
+
+function updateUserPill() {
+  if (!currentUser) return;
+  const pill = document.getElementById('userPill');
+  const initial = (currentUser.name || 'T')[0].toUpperCase();
+  document.getElementById('userAvatar').textContent = initial;
+  document.getElementById('userGreeting').textContent = 'Halo, ' + currentUser.name + '!';
+  pill.style.display = 'flex';
+}
+
+// ══════════════════════════════════════
+//  LEADERBOARD
+// ══════════════════════════════════════
+async function openLeaderboard() {
+  showPopup('lbPopup');
+  const el = document.getElementById('lbContent');
+  el.innerHTML = '<span class="status-msg loading"><span class="spin">⏳</span> Memuat papan skor...</span>';
+  try {
+    const res = await sheetsGet({ action: 'leaderboard' });
+    if (res.success && res.data && res.data.length) {
+      const rows = res.data.slice(0, 10).map((r, i) => {
+        const isMe = currentUser && r.wa === currentUser.wa;
+        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i+1);
+        return `<div class="lb-row ${isMe ? 'lb-me' : ''}">
+          <div class="lb-rank">${medal}</div>
+          <div class="lb-name">${escHtml(r.name)}</div>
+          <div class="lb-score">${Number(r.highScore).toLocaleString()}</div>
+        </div>`;
+      }).join('');
+      el.innerHTML = rows || '<div style="color:#666;padding:20px">Belum ada data</div>';
+    } else {
+      el.innerHTML = '<div style="color:#666;padding:20px;font-size:13px">Belum ada data papan skor.<br>Jadilah yang pertama! 🚀</div>';
+    }
+  } catch(e) {
+    el.innerHTML = '<div class="status-msg err">⚠️ Gagal memuat. Periksa koneksi.</div>';
+  }
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ══════════════════════════════════════
+//  8 ASNAF DATA
+// ══════════════════════════════════════
+const ASNAF = [
+  {icon:'🏚️',title:'Fakir',sub:'Asnaf ke-1',text:'Orang yang tidak memiliki harta benda dan tidak mampu memenuhi kebutuhan pokok hidupnya sama sekali.',ayat:'QS. At-Taubah: 60 — "Sesungguhnya zakat-zakat itu hanyalah untuk orang-orang fakir..."'},
+  {icon:'🍚',title:'Miskin',sub:'Asnaf ke-2',text:'Orang yang memiliki sedikit harta, namun tidak cukup untuk memenuhi kebutuhan dasar sehari-hari keluarganya.',ayat:'QS. At-Taubah: 60 — "...dan orang-orang miskin yang membutuhkan..."'},
+  {icon:'📋',title:'Amil Zakat',sub:'Asnaf ke-3',text:'Orang yang bertugas mengumpulkan, mengelola, dan mendistribusikan zakat kepada yang berhak menerimanya.',ayat:'QS. At-Taubah: 60 — "...dan para pengurus zakat (amil)..."'},
+  {icon:'☪️',title:'Muallaf',sub:'Asnaf ke-4',text:'Orang yang baru masuk Islam dan membutuhkan dukungan agar iman mereka semakin kuat dan teguh di jalan Allah.',ayat:'QS. At-Taubah: 60 — "...para muallaf yang perlu dikuatkan hatinya..."'},
+  {icon:'⛓️',title:'Riqab',sub:'Asnaf ke-5',text:'Pada masa lalu: membebaskan budak. Kini dimaknai: membantu orang yang terbelenggu kesulitan parah.',ayat:'QS. At-Taubah: 60 — "...untuk memerdekakan budak (riqab)..."'},
+  {icon:'💳',title:'Gharim',sub:'Asnaf ke-6',text:'Orang yang memiliki hutang untuk kepentingan yang dibenarkan syariat dan tidak mampu melunasinya.',ayat:'QS. At-Taubah: 60 — "...orang-orang yang berhutang (gharimin)..."'},
+  {icon:'🕌',title:'Fi Sabilillah',sub:'Asnaf ke-7',text:'Orang yang berjuang di jalan Allah, termasuk dakwah, pendidikan Islam, dan berbagai amal kebaikan.',ayat:'QS. At-Taubah: 60 — "...dan untuk jalan Allah (fi sabilillah)..."'},
+  {icon:'🧳',title:'Ibnu Sabil',sub:'Asnaf ke-8',text:'Musafir yang sedang dalam perjalanan jauh dan kehabisan bekal sehingga tidak bisa meneruskan perjalanan.',ayat:'QS. At-Taubah: 60 — "...dan untuk mereka yang sedang dalam perjalanan (ibnu sabil)."'},
+];
+
+// ══════════════════════════════════════
+//  GAME STATE
+// ══════════════════════════════════════
+let G = {};
+let animId = null;
+let paused = false;
+let gameRunning = false;
+let lastTime = 0;
+let shakeFrames = 0;
+
+function initState() {
+  G = {
+    score:0, level:1, lives:3, zakatTotal:0,
+    halalBuf:0, mustahiqCount:0, asnafIdx:0,
+    spawnTimer:0, spawnRate:1500, fallSpeed:2, haramRatio:0.1,
+    scoreTarget:200, coins:[], particles:[], mustahiq:null, player:null,
+  };
+}
+
+// ══════════════════════════════════════
+//  CANVAS
+// ══════════════════════════════════════
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+let W, H;
+
+function resizeCanvas() {
+  const wrap = document.getElementById('gameWrapper');
+  W = wrap.clientWidth;
+  H = wrap.clientHeight - 66 - 40;
+  canvas.width = W; canvas.height = H;
+  canvas.style.marginTop = '66px';
+  if (G.player) G.player.y = H - 72;
+}
+
+// ══════════════════════════════════════
+//  INPUT
+// ══════════════════════════════════════
+let inputBound = false;
+function setupInput() {
+  if (inputBound) return;
+  inputBound = true;
+  const gs = document.getElementById('gameScreen');
+  gs.addEventListener('mousemove', e => {
+    if (!gameRunning || paused || !G.player) return;
+    G.player.targetX = e.clientX - canvas.getBoundingClientRect().left;
+  });
+  gs.addEventListener('touchmove', e => {
+    e.preventDefault();
+    if (!gameRunning || paused || !G.player) return;
+    G.player.targetX = e.touches[0].clientX - canvas.getBoundingClientRect().left;
+  }, { passive:false });
+  gs.addEventListener('touchstart', e => {
+    if (!gameRunning || paused || !G.player) return;
+    G.player.targetX = e.touches[0].clientX - canvas.getBoundingClientRect().left;
+  }, { passive:true });
+}
+
+// ══════════════════════════════════════
+//  COIN TYPES
+// ══════════════════════════════════════
+const COINS = [
+  {type:'emas', score:10, color:'#FFD700', emoji:'💰', haram:false},
+  {type:'perak', score:5, color:'#C0C0C0', emoji:'🪙', haram:false},
+  {type:'judi', score:-20, color:'#FF4444', emoji:'🎲', haram:true},
+  {type:'riba', score:-20, color:'#FF4444', emoji:'📊', haram:true},
+  {type:'dusta', score:-20, color:'#FF4444', emoji:'🤥', haram:true},
+];
+
+function pickCoinType() {
+  const h = G.haramRatio;
+  const pool = [30*(1-h), 45*(1-h), h*33, h*33, h*34];
+  const total = pool.reduce((a,b)=>a+b,0);
+  let r = Math.random()*total;
+  for(let i=0;i<pool.length;i++){ r-=pool[i]; if(r<=0) return COINS[i]; }
+  return COINS[0];
+}
+
+function spawnCoin() {
+  const ct = pickCoinType();
+  G.coins.push({
+    x: 30+Math.random()*(W-60), y:-22,
+    ...ct,
+    speed: G.fallSpeed+Math.random()*0.6, r:20, active:true
+  });
+}
+
+// ══════════════════════════════════════
+//  COLLISION
+// ══════════════════════════════════════
+function hitTest(c) {
+  const p = G.player;
+  return c.x > p.x-p.w/2-c.r && c.x < p.x+p.w/2+c.r &&
+         c.y > p.y-p.h/2-c.r && c.y < p.y+p.h/2+c.r;
+}
+
+// ══════════════════════════════════════
+//  PARTICLES
+// ══════════════════════════════════════
+function burst(x,y,color,n=6) {
+  for(let i=0;i<n;i++) G.particles.push({
+    x,y, vx:(Math.random()-.5)*5, vy:-2-Math.random()*4,
+    color, alpha:1, size:3+Math.random()*4, life:40, text:null
+  });
+}
+
+function floatText(x,y,text,color) {
+  G.particles.push({x,y:y-10,vx:0,vy:-1.5,color,alpha:1,size:0,life:55,text});
+}
+
+// ══════════════════════════════════════
+//  HUD
+// ══════════════════════════════════════
+function updateHUD() {
+  document.getElementById('hudScore').textContent = G.score;
+  document.getElementById('hudZakat').textContent = G.zakatTotal.toFixed(2);
+  document.getElementById('hudLevel').textContent = G.level;
+  document.getElementById('hudLives').textContent = '❤️'.repeat(G.lives) + '🖤'.repeat(Math.max(0,3-G.lives));
+}
+
+// ══════════════════════════════════════
+//  ZAKAT
+// ══════════════════════════════════════
+function checkZakat() {
+  if (G.halalBuf >= 50) {
+    const amt = +(G.halalBuf*0.025).toFixed(2);
+    G.zakatTotal = +(G.zakatTotal+amt).toFixed(2);
+    G.halalBuf = 0;
+    G.mustahiqCount++;
+    showZakatFlash();
+    G.mustahiq = { timer:150 };
+  }
+}
+
+function showZakatFlash() {
+  const el = document.getElementById('zakatFlashText');
+  el.style.opacity = '1';
+  setTimeout(()=>{ el.style.opacity='0'; }, 1800);
+}
+
+// ══════════════════════════════════════
+//  LEVEL UP
+// ══════════════════════════════════════
+function triggerLevelUp() {
+  G.level++;
+  G.spawnRate  = Math.max(600, 1500-G.level*140);
+  G.fallSpeed  = Math.min(7.5, 2+G.level*0.65);
+  G.haramRatio = Math.min(0.3, 0.1+G.level*0.025);
+  G.scoreTarget = G.score + 300*G.level;
+  showAsnafPopup();
+}
+
+function showAsnafPopup() {
+  paused = true;
+  const a = ASNAF[G.asnafIdx%8];
+  document.getElementById('asnafIcon').textContent = a.icon;
+  document.getElementById('asnafTitle').textContent = a.title;
+  document.getElementById('asnafSub').textContent = a.sub;
+  document.getElementById('asnafText').textContent = a.text;
+  document.getElementById('asnafAyat').textContent = a.ayat;
+  showPopup('asnafPopup');
+}
+
+function resumeFromAsnaf() {
+  G.asnafIdx++;
+  closePopup('asnafPopup');
+  paused = false;
+}
+
+// ══════════════════════════════════════
+//  NAUDZUBILLAH
+// ══════════════════════════════════════
+function showNaudzubillah() {
+  const el = document.getElementById('naudzText');
+  el.style.opacity='1';
+  shakeFrames=22;
+  setTimeout(()=>{ el.style.opacity='0'; }, 900);
+}
+
+// ══════════════════════════════════════
+//  DRAW
+// ══════════════════════════════════════
+function drawBg() {
+  ctx.fillStyle='#060f1a'; ctx.fillRect(0,0,W,H);
+  // star dots
+  ctx.fillStyle='rgba(255,255,255,0.5)';
+  for(let i=0;i<28;i++) ctx.fillRect((i*137)%W,(i*97)%H,1.5,1.5);
+  // subtle grid lines
+  ctx.strokeStyle='rgba(255,255,255,0.015)';
+  ctx.lineWidth=1;
+  for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+}
+
+function drawPlayer(p) {
+  ctx.save();
+  ctx.translate(p.x, p.y-p.bounce);
+  ctx.rotate(p.lean*0.07);
+  // shadow
+  ctx.fillStyle='rgba(0,0,0,0.25)';
+  ctx.beginPath();ctx.ellipse(0,p.h/2-4,p.w/2-2,8,0,0,Math.PI*2);ctx.fill();
+  // badan
+  ctx.fillStyle='#388E3C';
+  ctx.beginPath();ctx.ellipse(0,4,p.w/2-4,p.h/2-6,0,0,Math.PI*2);ctx.fill();
+  // baju gamis
+  ctx.fillStyle='#2e7d32';
+  ctx.fillRect(-p.w/2+8,2,p.w-16,20);
+  // kepala
+  ctx.fillStyle='#FFCC80';
+  ctx.beginPath();ctx.arc(0,-p.h/2+12,13,0,Math.PI*2);ctx.fill();
+  // peci
+  ctx.fillStyle='#1a1a2e';
+  ctx.fillRect(-11,-p.h/2+2,22,7);
+  ctx.fillStyle='#0d0d1a';
+  ctx.fillRect(-11,-p.h/2+7,22,4);
+  // tangan kiri & kanan (mangkuk zakat)
+  ctx.fillStyle='#8D6E63';
+  [-p.w/2+8, p.w/2-8].forEach(tx=>{
+    ctx.beginPath();ctx.arc(tx,8,7,Math.PI,0);ctx.fill();
+  });
+  ctx.restore();
+}
+
+function drawCoin(c) {
+  ctx.save();
+  ctx.translate(c.x,c.y);
+  if(!c.haram){ctx.shadowColor=c.color;ctx.shadowBlur=14;}
+  else{ctx.shadowColor='#FF0000';ctx.shadowBlur=16;}
+  ctx.fillStyle=c.haram?'#c62828':c.color;
+  ctx.beginPath();ctx.arc(0,0,c.r,0,Math.PI*2);ctx.fill();
+  ctx.shadowBlur=0;
+  ctx.font=`${c.r*0.88}px serif`;
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(c.emoji,0,1);
+  ctx.restore();
+}
+
+function drawMustahiq() {
+  if(!G.mustahiq) return;
+  G.mustahiq.timer--;
+  if(G.mustahiq.timer<=0){G.mustahiq=null;return;}
+  const t=G.mustahiq.timer;
+  const slideUp=t>120?((150-t)/30)*30:30;
+  const alpha=t<30?t/30:1;
+  ctx.save();
+  ctx.globalAlpha=alpha;
+  ctx.translate(W/2,H-slideUp);
+  ctx.fillStyle='rgba(56,142,60,0.92)';
+  ctx.beginPath();
+  if(ctx.roundRect) ctx.roundRect(-92,-28,184,56,14);
+  else{const r=14,x=-92,y=-28,w=184,h=56;ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);}
+  ctx.fill();
+  ctx.fillStyle='#fff';ctx.font='bold 13px Nunito';ctx.textAlign='center';
+  ctx.fillText('🤲 Jazakallahu Khairan!',0,-8);
+  ctx.fillStyle='#c8e6c9';ctx.font='11px Nunito';
+  ctx.fillText(`Mustahiq ke-${G.mustahiqCount} terbantu`,0,10);
+  ctx.restore();
+}
+
+function drawParticles() {
+  for(const p of G.particles){
+    if(p.text){
+      ctx.save();ctx.globalAlpha=p.alpha;ctx.fillStyle=p.color;
+      ctx.font='bold 17px Nunito';ctx.textAlign='center';
+      ctx.fillText(p.text,p.x,p.y);ctx.restore();
+    } else {
+      ctx.save();ctx.globalAlpha=p.alpha;ctx.fillStyle=p.color;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill();ctx.restore();
+    }
+    p.x+=p.vx;p.y+=p.vy;if(!p.text)p.vy+=0.15;
+    p.alpha-=p.text?0.018:0.025;p.life--;
+  }
+  G.particles=G.particles.filter(p=>p.life>0&&p.alpha>0);
+}
+
+// ══════════════════════════════════════
+//  GAME LOOP
+// ══════════════════════════════════════
+function gameLoop(ts) {
+  if(!gameRunning) return;
+  const dt=Math.min(ts-lastTime,100);
+  lastTime=ts;
+
+  if(paused){ animId=requestAnimationFrame(gameLoop); return; }
+
+  const p=G.player;
+  const dx=p.targetX-p.x;
+  p.lean=dx*0.05; p.x+=dx*0.13;
+  p.x=Math.max(p.w/2,Math.min(W-p.w/2,p.x));
+  if(p.bounce>0) p.bounce-=0.5;
+
+  G.spawnTimer+=dt;
+  if(G.spawnTimer>=G.spawnRate){ spawnCoin(); G.spawnTimer=0; }
+
+  for(const c of G.coins){
+    if(!c.active) continue;
+    c.y+=c.speed;
+    if(c.y>H+30){c.active=false;continue;}
+    if(hitTest(c)){
+      c.active=false;
+      if(c.haram){
+        G.lives--;
+        showNaudzubillah();
+        burst(c.x,c.y,'#FF4444',8);
+        floatText(c.x,c.y,c.score.toString(),'#FF6B6B');
+        updateHUD();
+        if(G.lives<=0){endGame();return;}
+      } else {
+        G.score+=c.score;
+        G.halalBuf+=c.score;
+        burst(c.x,c.y,c.color,6);
+        floatText(c.x,c.y,'+'+c.score,'#FFD700');
+        p.bounce=8;
+        checkZakat();
+        if(G.score>=G.scoreTarget) triggerLevelUp();
+        updateHUD();
+      }
+    }
+  }
+  G.coins=G.coins.filter(c=>c.active);
+
+  ctx.save();
+  if(shakeFrames>0){ctx.translate((Math.random()-.5)*5,(Math.random()-.5)*5);shakeFrames--;}
+  drawBg();
+  for(const c of G.coins) drawCoin(c);
+  drawParticles();
+  drawMustahiq();
+  drawPlayer(p);
+  ctx.restore();
+
+  animId=requestAnimationFrame(gameLoop);
+}
+
+// ══════════════════════════════════════
+//  GAME FLOW
+// ══════════════════════════════════════
+function beginGame() {
+  if(animId) cancelAnimationFrame(animId);
+  initState();
+  resizeCanvas();
+  G.player={ x:W/2, y:H-72, targetX:W/2, w:50, h:60, lean:0, bounce:0 };
+  setupInput();
+  gameRunning=true; paused=false;
+  updateHUD();
+  lastTime=performance.now();
+  animId=requestAnimationFrame(gameLoop);
+  showScreen('gameScreen');
+}
+
+function pauseGame(){
+  if(!gameRunning) return;
+  paused=true; showPopup('pausePopup');
+}
+
+function resumeGame(){
+  closePopup('pausePopup'); paused=false;
+}
+
+function goToMenu(){
+  gameRunning=false; paused=false;
+  if(animId) cancelAnimationFrame(animId);
+  ['pausePopup','gameOverPopup','asnafPopup','lbPopup'].forEach(closePopup);
+  showScreen('menuScreen');
+}
+
+async function endGame(){
+  gameRunning=false; paused=false;
+  if(animId) cancelAnimationFrame(animId);
+
+  // Update local high score
+  const prevHi = currentUser?.highScore || 0;
+  const newHi  = Math.max(prevHi, G.score);
+  if(currentUser) { currentUser.highScore=newHi; saveSession(currentUser); }
+
+  document.getElementById('goScore').textContent = G.score;
+  document.getElementById('goLevel').textContent = G.level;
+  document.getElementById('goZakat').textContent = G.zakatTotal.toFixed(1);
+  document.getElementById('goHiScore').textContent = newHi;
+  showPopup('gameOverPopup');
+
+  // Save score to Sheets
+  const status=document.getElementById('goStatus');
+  status.className='status-msg loading';
+  status.innerHTML='<span class="spin">⏳</span> Menyimpan skor...';
+  try {
+    await sheetsPost({
+      action: 'saveScore',
+      name: currentUser?.name || 'Tamu',
+      wa: currentUser?.wa || '',
+      email: currentUser?.email || '',
+      score: G.score,
+      level: G.level,
+      zakatTotal: G.zakatTotal,
+      mustahiqHelped: G.mustahiqCount,
+      asnafLearned: G.asnafIdx,
+      highScore: newHi,
+      playedAt: new Date().toLocaleString('id-ID',{timeZone:'Asia/Jakarta'})
+    });
+    status.className='status-msg ok';
+    status.textContent='✅ Skor tersimpan!';
+  } catch(e) {
+    status.className='status-msg err';
+    status.textContent='⚠️ Gagal simpan skor';
+  }
+}
+
+function restartGame(){
+  closePopup('gameOverPopup');
+  beginGame();
+}
+
+// ══════════════════════════════════════
+//  SCREEN & POPUP HELPERS
+// ══════════════════════════════════════
+const SCREENS = ['authScreen','menuScreen','tutorialScreen','contactScreen','gameScreen'];
+
+function showScreen(id){
+  SCREENS.forEach(s=>document.getElementById(s).classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+  if(id==='menuScreen') updateUserPill();
+}
+
+function showPopup(id){ document.getElementById(id).classList.remove('popup-hidden'); }
+function closePopup(id){ document.getElementById(id).classList.add('popup-hidden'); }
+
+// ══════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+loadSession();
+
+if(currentUser){
+  afterAuth(); // sudah login sebelumnya → langsung ke menu
+} else {
+  showScreen('authScreen');
+}
+</script>
+</body>
+</html>
